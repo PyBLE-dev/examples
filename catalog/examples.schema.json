@@ -1,0 +1,454 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/PyBLE-dev/examples/catalog/examples.schema.json",
+  "title": "PyBLE examples catalog",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "catalog_version",
+    "status",
+    "firmware_baseline",
+    "profiles",
+    "examples"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "./examples.schema.json"
+    },
+    "catalog_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "status": {
+      "enum": ["development", "released"]
+    },
+    "firmware_baseline": {
+      "$ref": "#/$defs/firmwareBaseline"
+    },
+    "profiles": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/profile"
+      }
+    },
+    "examples": {
+      "type": "array",
+      "minItems": 32,
+      "maxItems": 32,
+      "items": {
+        "$ref": "#/$defs/example"
+      }
+    }
+  },
+  "$defs": {
+    "profile": {
+      "enum": [
+        "esp32-4mb",
+        "esp32-s3-n16r8",
+        "waveshare-esp32-s3-lcd-147b",
+        "esp32-c3-4mb",
+        "rpi-pico2-w"
+      ]
+    },
+    "firmwareBaseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "agent",
+        "protocol",
+        "micropython",
+        "source_commit",
+        "release_tag",
+        "release_descriptor_sha256"
+      ],
+      "properties": {
+        "agent": {
+          "const": "0.6.0"
+        },
+        "protocol": {
+          "const": "PBLE/1"
+        },
+        "micropython": {
+          "const": "1.28.0"
+        },
+        "source_commit": {
+          "const": "0c7230d6708797c241160ba71fbd37e6b22f180a"
+        },
+        "release_tag": {
+          "const": "firmware-v0.6.0"
+        },
+        "release_descriptor_sha256": {
+          "const": "c2940281a14feddb55c48de15ac18087e9317d1b7130e514fab5a209b046a1e6"
+        }
+      }
+    },
+    "stringList": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "module": {
+      "enum": [
+        "asyncio",
+        "binascii",
+        "gc",
+        "json",
+        "machine",
+        "neopixel",
+        "os",
+        "pyble_st7789",
+        "pyble_waveshare_lcd147b",
+        "struct",
+        "sys",
+        "time"
+      ]
+    },
+    "capability": {
+      "enum": [
+        "asyncio",
+        "binary-data",
+        "console-input",
+        "core-python",
+        "filesystem",
+        "gc",
+        "json",
+        "machine-adc",
+        "machine-pin",
+        "machine-pwm",
+        "neopixel",
+        "soft-i2c",
+        "soft-spi",
+        "waveshare-lcd147b",
+        "waveshare-marker"
+      ]
+    },
+    "concept": {
+      "enum": [
+        "adc",
+        "asyncio",
+        "binary",
+        "branching",
+        "cleanup",
+        "collections",
+        "composition",
+        "console",
+        "debounce",
+        "digital-input",
+        "digital-output",
+        "directory",
+        "display",
+        "drawing",
+        "exceptions",
+        "filesystem",
+        "functions",
+        "gpio",
+        "i2c",
+        "input",
+        "json",
+        "logging",
+        "loops",
+        "memory",
+        "neopixel",
+        "pacing",
+        "pwm",
+        "runtime",
+        "spi",
+        "stop",
+        "time",
+        "validation",
+        "variables"
+      ]
+    },
+    "incompatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["profile", "reason"],
+      "properties": {
+        "profile": {
+          "$ref": "#/$defs/profile"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "requirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "modules",
+        "capabilities",
+        "components",
+        "configuration",
+        "wiring",
+        "app"
+      ],
+      "properties": {
+        "modules": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/module"
+          }
+        },
+        "capabilities": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/capability"
+          }
+        },
+        "components": {
+          "$ref": "#/$defs/stringList"
+        },
+        "configuration": {
+          "$ref": "#/$defs/stringList"
+        },
+        "wiring": {
+          "$ref": "#/$defs/stringList"
+        },
+        "app": {
+          "$ref": "#/$defs/stringList"
+        }
+      }
+    },
+    "effects": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pins_driven",
+        "files_created",
+        "output",
+        "duration_seconds_max",
+        "cleanup",
+        "persistent"
+      ],
+      "properties": {
+        "pins_driven": {
+          "$ref": "#/$defs/stringList"
+        },
+        "files_created": {
+          "$ref": "#/$defs/stringList"
+        },
+        "output": {
+          "type": "string",
+          "minLength": 1
+        },
+        "duration_seconds_max": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 120
+        },
+        "cleanup": {
+          "type": "string",
+          "minLength": 1
+        },
+        "persistent": {
+          "type": "boolean"
+        }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_bytes_max",
+        "import_batch_bytes_max",
+        "heap_bytes_max",
+        "output_bytes_max",
+        "runtime_seconds_max"
+      ],
+      "properties": {
+        "source_bytes_max": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32768
+        },
+        "import_batch_bytes_max": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 131072
+        },
+        "heap_bytes_max": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 262144
+        },
+        "output_bytes_max": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4096
+        },
+        "runtime_seconds_max": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 120
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "host_evidence", "hil_evidence"],
+      "properties": {
+        "status": {
+          "enum": [
+            "planned",
+            "host_passed",
+            "hil_passed",
+            "not_applicable",
+            "known_incompatible"
+          ]
+        },
+        "host_evidence": {
+          "$ref": "#/$defs/stringList"
+        },
+        "hil_evidence": {
+          "$ref": "#/$defs/stringList"
+        }
+      }
+    },
+    "example": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "summary",
+        "planned_release",
+        "path",
+        "entrypoint",
+        "files",
+        "category",
+        "level",
+        "concepts",
+        "classification",
+        "designed_profiles",
+        "validated_profiles",
+        "known_incompatible",
+        "requires",
+        "effects",
+        "minimum_firmware",
+        "protocol",
+        "limits",
+        "validation",
+        "license"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "planned_release": {
+          "enum": ["0.1.0", "0.2.0", "0.3.0"]
+        },
+        "path": {
+          "type": "string",
+          "pattern": "^examples/[a-z0-9_/]+$"
+        },
+        "entrypoint": {
+          "type": "string",
+          "maxLength": 48,
+          "pattern": "^pyble_[a-z0-9_]+\\.py$"
+        },
+        "files": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "maxLength": 48,
+            "pattern": "^pyble_[a-z0-9_]+\\.py$"
+          }
+        },
+        "category": {
+          "enum": [
+            "basics",
+            "buses",
+            "data",
+            "display",
+            "gpio",
+            "neopixel",
+            "projects",
+            "workflow"
+          ]
+        },
+        "level": {
+          "enum": ["beginner", "intermediate"]
+        },
+        "concepts": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/concept"
+          }
+        },
+        "classification": {
+          "enum": ["portable", "capability", "exact-hardware", "project"]
+        },
+        "designed_profiles": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/profile"
+          }
+        },
+        "validated_profiles": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/profile"
+          }
+        },
+        "known_incompatible": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/incompatibility"
+          }
+        },
+        "requires": {
+          "$ref": "#/$defs/requirements"
+        },
+        "effects": {
+          "$ref": "#/$defs/effects"
+        },
+        "minimum_firmware": {
+          "const": "0.6.0"
+        },
+        "protocol": {
+          "const": "PBLE/1"
+        },
+        "limits": {
+          "$ref": "#/$defs/limits"
+        },
+        "validation": {
+          "$ref": "#/$defs/validation"
+        },
+        "license": {
+          "const": "MIT"
+        }
+      }
+    }
+  }
+}

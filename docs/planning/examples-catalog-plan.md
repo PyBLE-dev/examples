@@ -2,21 +2,25 @@
 
 # PyBLE examples repository and complete catalog plan
 
-- Status: **Draft for maintainer review**
-- Plan revision: 0.1
+- Status: **Implemented; HIL validation and release pending**
+- Plan revision: 1.1
 - Prepared: 2026-08-25
+- Approved: 2026-08-25 by explicit maintainer implementation instruction
+- Implementation reconciled: 2026-08-25
 - Target repository: `https://github.com/PyBLE-dev/examples`
 - Local working copy: `/Users/vyv/Working/SciLabPro/PyBLE-Examples`
 
-> Implementation gate: this document must be reviewed and approved before any
-> runnable example, machine-readable catalog, validator, CI workflow, or PyBLE
-> app integration is added. The repository initially contains only its landing
-> page, MIT license, and this plan.
+> Implementation record: the maintainer explicitly instructed implementation
+> of the complete plan on 2026-08-25. All 32 source examples, the development
+> catalog/schema, repository validator, host suite, evidence schema, and CI now
+> exist. Local host, catalog, and pinned `mpy-cross` gates pass. Every catalog
+> validation status remains `planned`; HIL, live app import, and release gates
+> remain open.
 
-## 1. Decision requested
+## 1. Decision recorded
 
-Approve this document as the initial scope and architecture for the official
-PyBLE example collection. In particular, review:
+This document is the approved initial scope and architecture for the official
+PyBLE example collection. The approval covers:
 
 1. the 32-example catalog and its release grouping;
 2. the distinction between portable, capability-based, and exact-hardware
@@ -26,8 +30,8 @@ PyBLE example collection. In particular, review:
 5. the repository/catalog layout required by the current GitHub importer; and
 6. the deferred and excluded topics.
 
-Approval authorizes a later implementation phase. It does not approve every
-future example that might be imagined; additions or scope changes will update
+Approval authorized the completed source implementation. It does not approve
+every future example that might be imagined; additions or scope changes update
 this plan or a successor roadmap first.
 
 ## 2. Goal
@@ -68,7 +72,7 @@ The initial plan is pinned to the qualified PyBLE v0.6.0 release:
 
 The five release profile IDs are:
 
-| Profile ID | Kind | Planned example surface |
+| Profile ID | Kind | Designed example surface |
 | --- | --- | --- |
 | `esp32-4mb` | Generic firmware profile | Portable examples and explicitly configured generic hardware examples; frozen `neopixel` |
 | `esp32-s3-n16r8` | Generic firmware profile | Portable examples and explicitly configured generic hardware examples; frozen `neopixel` |
@@ -94,18 +98,18 @@ the current app nor example code may infer the exact profile from the chip name.
 | `W1` | `waveshare-esp32-s3-lcd-147b` only |
 | `P1` | `rpi-pico2-w` only |
 
-`A5`, `E4`, `W1`, and `P1` express intended compatibility. A catalog record
-will separately list the profiles on which the exact source revision has passed
-hardware-in-the-loop (HIL) validation. No planned row below is a completed
-validation claim.
+`A5`, `E4`, `W1`, and `P1` express intended compatibility. Catalog records
+separately list profiles on which the exact source revision has passed
+hardware-in-the-loop (HIL) validation. Those lists are currently empty; no row
+below is a completed validation claim.
 
-The current common runtime surface is sufficient for the planned portable set,
-including `machine`, `asyncio`, `array`, `binascii`, `collections`, `framebuf`,
-`gc`, `hashlib`, `io`, `json`, `math`, `os`, `random`, `re`, `struct`, `sys`,
-and `time`. The ESP profiles additionally provide `esp`, `esp32`, and
-`neopixel`. Pico provides `rp2`, but PIO remains deferred until its lifecycle
-and Stop behavior are specified. Examples must not silently bundle around a
-missing firmware module.
+The current common runtime surface is sufficient for the implemented portable
+set, including `machine`, `asyncio`, `array`, `binascii`, `collections`,
+`framebuf`, `gc`, `hashlib`, `io`, `json`, `math`, `os`, `random`, `re`,
+`struct`, `sys`, and `time`. The ESP profiles additionally provide `esp`,
+`esp32`, and `neopixel`. Pico provides `rp2`, but PIO remains deferred until
+its lifecycle and Stop behavior are specified. Examples must not silently
+bundle around a missing firmware module.
 
 ## 4. Design principles
 
@@ -114,14 +118,15 @@ missing firmware module.
    nearly identical board folders.
 2. **Exact hardware only when exact hardware is named.** Fixed board pins are
    allowed for the Waveshare and Pico 2 W exact profiles only.
-3. **Configured generic hardware.** Generic GPIO, PWM, ADC, I2C, and SPI examples
-   ship with visibly unset configuration values and refuse to touch hardware
-   until the user supplies and reviews them.
+3. **Configured generic hardware.** Generic GPIO, PWM, ADC, I2C, and SPI
+   examples ship with visibly unset configuration values and refuse to touch
+   hardware until the user supplies and reviews them.
 4. **Safe by default.** Work and console output are bounded; output devices are
    returned to an inactive state; resources are deinitialized where the port
    supports it; files are never silently overwritten.
 5. **Readable source.** Only source `.py` examples are shipped. Each is small,
-   documented, and useful without generated assets or compiled `.mpy` files.
+   starts with child-facing settings and run instructions, explains new words,
+   and is useful without generated assets or compiled `.mpy` files.
 6. **The constrained profiles define portability.** Common examples are checked
    on classic ESP32, ESP32-C3, and Pico 2 W, not just an S3 with PSRAM.
 7. **Evidence, not implication.** `designed_profiles` and `validated_profiles`
@@ -130,9 +135,9 @@ missing firmware module.
    and tests are authored fresh from PyBLE's public contracts. Unknown-licensed
    or proprietary examples are not adapted.
 
-## 5. Proposed repository layout
+## 5. Repository layout
 
-The implementation phase should create this shape incrementally:
+The implementation uses this shape:
 
 ```text
 .
@@ -144,6 +149,7 @@ The implementation phase should create this shape incrementally:
 ├── docs/
 │   ├── authoring.md
 │   ├── compatibility.md
+│   ├── release-policy.md
 │   ├── validation.md
 │   └── planning/
 │       └── examples-catalog-plan.md
@@ -162,16 +168,18 @@ The implementation phase should create this shape incrementally:
 │   └── projects/<example>/
 ├── tests/
 ├── tools/
+├── validation/
 ├── AGENTS.md
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
 ├── LICENSE
+├── Makefile
 ├── README.md
 └── SECURITY.md
 ```
 
-Each `<example>` is a leaf directory. It contains one runnable `.py` file by
-default, and every example in this roadmap is currently single-file.
+Each `<example>` is a leaf directory containing one runnable `.py` file; all 32
+implemented examples are single-file.
 Explanatory information required at import time lives in the module docstring
 and catalog, because the current app does not preview a leaf README. A
 multi-file local-module lesson is deferred until the runner defines a reliable
@@ -192,6 +200,8 @@ on a future catalog feature:
 - only direct, regular, lowercase `.py` blobs in the open folder are importable;
 - selected files are flattened by basename into the board's current working
   directory; remote subdirectories are not recreated;
+- PBLE returns one non-paginated directory listing capped at 480 response
+  bytes, and the importer refuses conflict checks against a truncated listing;
 - one file must be no larger than 256 KiB, the selected batch no larger than
   1 MiB, and a target path no longer than 128 UTF-8 bytes;
 - source must be valid UTF-8 and contain no NUL byte;
@@ -200,7 +210,7 @@ on a future catalog feature:
 - the app does not automatically open or run an imported file; and
 - the app does not yet persist complete source provenance on the board.
 
-The repository will deliberately use narrower limits:
+The repository deliberately uses narrower limits:
 
 | Item | Repository limit |
 | --- | --- |
@@ -212,25 +222,34 @@ The repository will deliberately use narrower limits:
 | Encoding | UTF-8, LF line endings, no NUL byte |
 
 Global filename uniqueness prevents two examples imported at different times
-from unexpectedly overwriting one another. Documentation will recommend a
-dedicated target directory such as `/examples`, where available, and reviewing
-existing names before import. Source must not assume that the runner changes
+from unexpectedly overwriting one another. Implemented `pyble_*.py` entrypoints
+cannot be written at board root because PyBLE reserves top-level `pyble` and
+`pble` prefixes. The 32 basenames also cannot safely share one `/examples`
+directory: their encoded FILE_LIST payload needs 1,018 bytes and would be
+truncated, blocking later imports.
+
+Documentation therefore requires bounded board category directories derived
+by removing the example leaf from its remote parent. For example,
+`examples/portable/basics/hello_console/` maps to
+`/examples/portable/basics/`. This produces nine import destinations; the
+largest complete catalog listing needs 186 payload bytes, below the enforced
+240-byte repository budget and leaving margin within PBLE's response. Users
+create each directory level through Files because import does not call
+`mkdir`. Source must not assume that the runner changes
 the MicroPython VM's working directory to the Files UI/import destination or
 adds the executed file's parent to `sys.path`. Filesystem examples therefore
 use reviewed absolute paths, and the initial roadmap does not rely on sibling
 module imports.
 
-## 7. Complete proposed example catalog
+## 7. Complete implemented example catalog
 
-The 32 entries below are the complete implementation roadmap for the first
-three example releases. `v0.1` is intentionally small but demonstrates the
-portable, capability, and exact-hardware classifications and reaches every
-profile. `v0.2` builds a practical learning and hardware-capability library.
-`v0.3` introduces the project classification and adds deeper exact-hardware
-coverage.
+All 32 entries below have source files and development catalog records. They
+remain grouped into the first three planned releases: `v0.1` establishes the
+portable, capability, and exact-hardware paths; `v0.2` adds the language, data,
+workflow, and configured-hardware library; and `v0.3` adds composed projects
+and deeper exact-hardware coverage. No release tag or HIL claim exists yet.
 
-All filenames are provisional until plan approval, after which their stable IDs
-and basenames should not be casually renamed.
+The approved stable IDs and basenames below must not be casually renamed.
 
 ### 7.1 v0.1 — first usable collection (8 examples)
 
@@ -239,9 +258,9 @@ and basenames should not be casually renamed.
 | `portable-hello-console` | `pyble_hello_console.py` | First import, Run, and console output | `A5` | Core Python; one bounded message; no hardware or files |
 | `portable-paced-counter` | `pyble_paced_counter.py` | Variables, a finite loop, and pacing | `A5` | `time.sleep_ms`; finite duration and small output |
 | `portable-runtime-info` | `pyble_runtime_info.py` | Show implementation, platform, and free heap | `A5` | `sys`, `os`, `gc`; never prints MAC address, `machine.unique_id()`, label, or another identifier |
-| `portable-file-round-trip` | `pyble_file_round_trip.py` | Create, verify, and remove a tiny text file safely | `A5` | Uses the reviewed absolute path `/pyble_example_round_trip.txt`; refuses overwrite; removes only the file it created; explains possible residue after interruption |
+| `portable-file-round-trip` | `pyble_file_round_trip.py` | Create, verify, and remove a tiny text file safely | `A5` | Uses `/examples/pyble_example_round_trip.txt`, which remains visible through the app's filesystem jail; refuses overwrite; requires no concurrent Files mutation; removes the verified path and explains possible residue |
 | `gpio-blink-external-led` | `pyble_gpio_blink.py` | Configurable digital output with an external LED | `A5` | Unset pin; external LED/resistor; finite toggles; inactive in `finally` |
-| `neopixel-single-pixel` | `pyble_neopixel_single.py` | Construct and update one addressable pixel | `E4` | Unset data pin and count; dim finite colors; all pixels off in `finally` |
+| `neopixel-single-pixel` | `pyble_neopixel_single.py` | Construct and update one addressable pixel | `E4` | Unset data pin; fixed count of one; dim finite colors; pixel off in `finally` |
 | `pico2w-onboard-led` | `pyble_pico2w_onboard_led.py` | Use the Pico 2 W's named onboard LED | `P1` | `machine.Pin("LED")`; finite blink; LED off in `finally` |
 | `waveshare-lcd147b-hello` | `pyble_waveshare_lcd147b_hello.py` | Show a bounded hello frame on the exact B-version LCD | `W1` | Qualified display helper/wiring only; bounded display time; backlight off and display deinitialized in `finally` |
 
@@ -256,26 +275,29 @@ paths before scaling the collection.
 | `portable-data-decisions` | `pyble_data_decisions.py` | Values, strings, collections, and branching in one coherent example | `A5` | Core Python; bounded console output |
 | `portable-reusable-functions` | `pyble_reusable_functions.py` | Parameters, return values, and reuse | `A5` | Core Python; deterministic bounded output |
 | `portable-error-handling` | `pyble_error_handling.py` | Validate data and handle one deliberate exception | `A5` | Catches only the expected error; no persistent effect |
-| `portable-console-input` | `pyble_console_input.py` | One prompt/response through the PyBLE console | `A5` | `input()`; tells users not to enter secrets; no echo loop; publish only after five-profile Run/Stop HIL |
+| `portable-console-input` | `pyble_console_input.py` | One prompt/response through the PyBLE console | `A5` | `input()` echoes and transiently retains the line before source validation; operator enters at most four printable ASCII, non-secret characters to fit the Pico console budget and uses Stop within 120 seconds if unanswered; publish only after five-profile Run/Stop HIL |
 | `portable-json-data` | `pyble_json_data.py` | Encode and decode a small in-memory object | `A5` | `json`; no filesystem write; bounded output |
 | `portable-async-cooperation` | `pyble_async_cooperation.py` | Run two finite, paced cooperative tasks | `A5` | `asyncio`; finite tasks; runner and Stop interaction require five-profile HIL |
 | `portable-binary-data` | `pyble_binary_data.py` | Pack, inspect, and unpack one small binary record | `A5` | `struct` and `binascii`; in-memory only; fixed-size data and bounded hexadecimal output |
 | `workflow-stop-a-program` | `pyble_stop_a_program.py` | Practice stopping a visibly active but bounded program | `A5` | Paced counter with a hard maximum duration; cleanup remains safe if Stop interrupts it |
 | `workflow-expected-error` | `pyble_expected_error.py` | Recognize an intentional runner traceback | `A5` | Prints intent, then raises one documented `ValueError`; filename and docstring make the failure unmistakable |
-| `filesystem-list-directory` | `pyble_list_directory.py` | List one explicit board directory without modifying it | `A5` | `os`; reviewed absolute path (default `/`); never assumes the VM working directory matches the Files UI; non-recursive, names only, capped output |
+| `filesystem-list-directory` | `pyble_list_directory.py` | List one explicit board directory without modifying it | `A5` | `gc`, `os`; reviewed absolute path (default `/`); never assumes the VM working directory matches the Files UI; non-recursive, scans at most 21 entries, renders at most 20 sanitized names on one bounded physical line, then releases and collects the iterator |
 
 ### 7.3 v0.2 — configured hardware capabilities (7 examples)
 
-Every pin or bus value in this section is unset in published source. The code
+Every pin or bus value in this section is unset in implemented source. The code
 validates configuration before constructing a peripheral. HIL uses
 operator-supplied fixture values without turning those values into defaults.
+Each source puts a complete comment-only setup recipe beside those values. The
+recipe is labeled as one board example and requires an adult check; it is not a
+portable pin-map claim.
 
 | Stable ID | Entrypoint | Purpose | Group | Requirements and safety |
 | --- | --- | --- | --- | --- |
 | `gpio-read-external-button` | `pyble_gpio_button.py` | Read a pulled digital input for a bounded period | `A5` | Explicit pin and documented low-voltage button circuit; finite, paced output |
 | `gpio-button-controls-led` | `pyble_gpio_button_led.py` | Combine input, branching, and output | `A5` | Two distinct pins; button plus external LED/resistor; LED inactive in `finally` |
 | `gpio-pwm-fade` | `pyble_gpio_pwm_fade.py` | Change PWM duty gradually | `A5` | Explicit PWM-capable pin; bounded frequency/duty; output off and PWM deinitialized |
-| `gpio-adc-sampling` | `pyble_gpio_adc_sampling.py` | Take finite normalized ADC readings | `A5` | Explicit ADC-capable pin; external voltage must remain within the board/pin limit; read only |
+| `gpio-adc-sampling` | `pyble_gpio_adc_sampling.py` | Take raw and 0-to-1 scaled ADC readings | `A5` | Explicit ADC-capable pin; external voltage must remain within the board/pin limit; read only |
 | `bus-i2c-scan` | `pyble_i2c_scan.py` | Discover addresses on an explicitly wired bus | `A5` | `machine.SoftI2C`; explicit SDA/SCL and pull-ups; reviewed low-voltage bus; one bounded scan |
 | `bus-spi-loopback` | `pyble_spi_loopback.py` | Verify SCK/MOSI/MISO using a loopback jumper | `A5` | `machine.SoftSPI`; distinct explicit pins; finite payload; deinitialize where supported |
 | `neopixel-strip-chase` | `pyble_neopixel_chase.py` | Index pixels in a finite moving pattern | `E4` | Explicit pin/count; capped count and iterations; low brightness; entire strip off in `finally` |
@@ -292,7 +314,7 @@ not promise that an arbitrary carrier board exposes every capability.
 | `waveshare-lcd147b-shapes` | `pyble_waveshare_lcd147b_shapes.py` | Demonstrate fill, pixel, line, rectangle, text, and show operations | `W1` | Exact display contract; bounded frame; backlight off and display deinitialized |
 | `waveshare-lcd147b-onboard-pixel` | `pyble_waveshare_lcd147b_pixel.py` | Use the exact board's WS2812 on GPIO38 | `W1` | Requires an inert `pyble_waveshare_lcd147b` marker import and explicit exact-board confirmation before constructing GPIO38; dim finite sequence; pixel off |
 | `project-button-press-counter` | `pyble_project_button_counter.py` | Debounce and count button presses for a finite interval | `A5` | Explicit input pin; bounded observation and paced console output |
-| `project-adc-data-logger` | `pyble_project_adc_logger.py` | Combine ADC sampling with a small CSV-style log | `A5` | Explicit ADC configuration; fixed sample/byte caps; refuses to overwrite the reviewed absolute path `/pyble_adc_log.csv`; intentionally retains it for inspection |
+| `project-adc-data-logger` | `pyble_project_adc_logger.py` | Combine ADC sampling with a small CSV-style log | `A5` | Explicit ADC configuration; fixed sample/byte caps; refuses to overwrite `/examples/pyble_adc_log.csv`, which remains visible through the app's filesystem jail; intentionally retains it for inspection |
 | `project-button-neopixel` | `pyble_project_button_neopixel.py` | Combine button input and pixel feedback | `E4` | Explicit distinct pins/count; finite, dim output; strip off in `finally` |
 | `project-waveshare-lcd147b-dashboard` | `pyble_waveshare_lcd147b_dashboard.py` | Refresh time and free-memory data in a few display frames | `W1` | No unqualified sensor assumption; paced bounded refresh; display cleanup |
 
@@ -307,7 +329,7 @@ not promise that an arbitrary carrier board exposes every capability.
 | `rpi-pico2-w` | 14 | 9 GPIO/bus/project | 2 exact onboard-LED examples |
 
 The counts overlap where a composed project uses a capability. They describe
-planned coverage, not passed validation.
+implemented design coverage, not passed HIL validation.
 
 ## 8. Exact-hardware contracts
 
@@ -339,8 +361,8 @@ v0.6.0 Pico manifest does not freeze or claim the `neopixel` module.
 
 ## 9. Catalog contract
 
-`catalog/examples.json` will be the machine-readable source of truth once its
-schema is approved. Each example record should include at least:
+`catalog/examples.json` is the machine-readable source of truth and
+`catalog/examples.schema.json` is its strict schema. Each record includes:
 
 | Field | Meaning |
 | --- | --- |
@@ -358,11 +380,28 @@ schema is approved. Each example record should include at least:
 | `validation` | Status plus links/IDs for host and HIL evidence |
 | `license` | `MIT` and source SPDX conformance |
 
-The JSON Schema will reject unknown fields (`additionalProperties: false`) and
-enumerate all profile IDs and controlled capability terms. Validation states
-will be `planned`, `host_passed`, `hil_passed`, `not_applicable`, or
+The JSON Schema rejects unknown fields (`additionalProperties: false`) and
+enumerates all profile IDs and controlled capability terms. Validation states
+are `planned`, `host_passed`, `hil_passed`, `not_applicable`, or
 `known_incompatible`. An example cannot list a profile in
 `validated_profiles` without matching immutable evidence.
+
+The catalog has development status, all 32 records have validation status
+`planned`, every `validated_profiles` list is empty, and
+`validation/index.json` contains no evidence records. Passing local host gates
+does not change those evidence-backed fields automatically.
+
+Catalog runtime and output maxima are hard source-work contracts over every
+configuration accepted by the validators, under an active PBLE session with a
+responsive console. Aggregate checks reserve the 40 ms interval between every
+physical console write—including separate `print()` body and newline
+writes—plus setup, cleanup, and final status output; they do not merely describe
+the published defaults. PyBLE v0.6.0 may additionally spend up to 250 ms on each
+backpressured console-notification attempt. That transport contingency is
+outside source control and the catalog maximum is therefore not a universal
+stalled-link wall-clock guarantee; HIL records observed wall time. The
+console-input lesson is the explicit interactive exception and records its
+operator-enforced Stop and transmit-budget bounds.
 
 The app may later consume a versioned catalog to provide filtering or prefill a
 repository URL/ref. That is a separate PyBLE app specification change. This
@@ -371,13 +410,16 @@ runtime chip string.
 
 ## 10. Example source contract
 
-Every runnable example will:
+Every implemented runnable example is required to:
 
 - carry `SPDX-License-Identifier: MIT`;
 - begin with a concise docstring containing purpose, prerequisites, wiring,
-  persistent effects, expected observation, and Stop/cleanup behavior;
-- define a small `main()` and keep import inert, subject to verification against
-  the PyBLE runner before the convention is frozen;
+  settings, pre-run steps, one safe change to try, persistent effects, expected
+  observation, and Stop/cleanup behavior;
+- write the opening instructions for a child, using complete sentences and
+  explaining each new technical word or unit before relying on it;
+- define a small `main()` behind the verified
+  `if __name__ == "__main__":` runner guard and remain inert on import;
 - validate all user configuration before opening a peripheral or driving a pin;
 - prefer finite work; a Stop lesson must also have a hard time/iteration bound;
 - pace console and peripheral updates;
@@ -386,9 +428,21 @@ Every runnable example will:
   the runtime permits it;
 - avoid hardware access in callbacks unless separately reviewed;
 - avoid unique IDs, MAC addresses, credentials, tokens, or user-entered secrets;
-- use reviewed absolute filesystem paths, refuse to overwrite an existing file,
-  and delete only a file it created; and
+- use reviewed absolute filesystem paths below `/examples` so the files remain
+  manageable through the app, refuse to overwrite an existing file, and delete
+  only a file it created; and
 - make expected failures unmistakable in its filename, docstring, and output.
+
+Every learner-editable `None` or `False` hardware value must have a nearby
+`SETUP GUIDE`. The guide explains why the lesson stops safely, names all values
+and allowed ranges, shows one internally consistent comment-only recipe that is
+conditional on the exact board guide or names its checked carrier, requires a
+teacher or adult to check it, and marks its end before program logic. Generic
+pins remain unset in published source. A quoted `"none"` pull setting is
+explained separately from Python `None`.
+Each sample uses one parseable `# CONSTANT = literal` line per setting. Host
+tests read every complete recipe and pass the values through the source's own
+configuration validator.
 
 Portable examples should normally remain below 32 KiB of additional live heap.
 Any example that needs more must state and validate a profile-specific budget.
@@ -405,32 +459,60 @@ protect a user from unsafe physical wiring.
 
 ### Pull-request gates
 
-Before an example can merge, automation should verify:
+The repository validator and host suite verify:
 
 1. the catalog JSON against a strict schema;
 2. every tracked `.py` is cataloged and every catalog file exists;
 3. stable IDs, paths, and case-folded basenames are unique;
-4. filename, file-mode, path-length, encoding, NUL, size, and batch limits;
+4. filename, file-mode, path-length, encoding, NUL, size, batch, and bounded
+   board-category FILE_LIST limits;
 5. no symlink, submodule, executable source, LFS pointer, generated `.mpy`, or
    firmware binary appears in the importable tree;
-6. SPDX/license and clean-room prohibited-identifier gates;
+6. SPDX, unique-identifier, and credential-like constant gates;
 7. compilation with the matching pinned `mpy-cross`, with all output kept in a
    temporary untracked directory;
-8. bounded host tests for portable logic and faked hardware tests where useful;
-9. an allowed-import/capability check against the firmware profile manifests;
-10. source-level safety checks for forbidden entrypoint names, secret-like data,
-    unbounded output patterns, and undeclared filesystem effects; and
-11. documentation/catalog agreement.
+8. bounded host tests for portable logic and faked hardware behavior, including
+   completion, Stop, and cleanup paths;
+9. declared imports and capabilities against the pinned profile module matrix;
+10. source-level checks for forbidden names/modules, hardware-import inertia,
+    constant-true loops, and absolute declared filesystem effects; and
+11. catalog/source agreement for inventory, modules, runtime caps, nonempty
+    child-facing docstring sections, and parseable setup recipes that pass each
+    example's configuration validator.
 
-The PyBLE repository's no-leak policy should be adapted deliberately for this
-repository, not copied as an unexplained snapshot. Dependency licenses and any
-third-party test-only tooling must be recorded.
+Run the implemented gates with:
+
+```sh
+make test
+make validate-host
+make validate-mpy MPY_CROSS=/absolute/path/to/pinned/mpy-cross
+```
+
+At this implementation revision, the standard-library host suite passes, the
+repository validator accepts all 32 examples, and all 32 compile with
+`mpy-cross` from pinned MicroPython 1.28.0. These results cover repository
+contracts, portable behavior, and fake-hardware behavior; they do not execute
+physical hardware or establish a catalog `host_passed`/`hil_passed` evidence
+record.
+
+Source audit also identified two v0.6.0 runtime gates that this repository
+cannot close by inspection: the ESP native runner reuses its globals across
+sequential RUN operations, and console input may be queued outside a run and
+persist until VM reset. Five-profile conformance must cover fresh `__main__`
+state, sequential-run heap/behavior, stale input, echo/history, overflow,
+prompt Stop recovery, and continued PBLE responsiveness. Until an upstream
+fix or equivalent evidence exists, development evaluation uses a fresh soft
+reboot and sends console input only after the prompt.
 
 ### Hardware-in-the-loop gates
 
 For a profile to enter `validated_profiles`, evidence must bind:
 
-- example repository commit and exact source SHA-256 values;
+- example repository commit and validator-verified canonical source SHA-256
+  values;
+- the executed board-source SHA-256 values, exact approved constant edits, and
+  an archived configured-source asset whenever execution differs from the
+  imported canonical source;
 - firmware release/tag, source commit, and release descriptor SHA-256;
 - exact firmware `profile_id` and, for generic profiles, the named test carrier;
 - wiring, external components, and fixture/harness revision;
@@ -442,6 +524,11 @@ For a profile to enter `validated_profiles`, evidence must bind:
   usability;
 - validator version, operator, UTC timestamp, and result.
 
+Every configurable example record must include all published unset constants
+(and exact-board confirmation where applicable) in `configuration_edits`.
+Wiring is never an empty evidence field: portable records explicitly state that
+no external wiring was used. UTC timestamps use RFC 3339 `Z` form.
+
 The first portable release must be run from identical source on all five
 profiles. Generic hardware examples need HIL on every profile they claim, using
 declared fixture pins. Exact examples need their exact named board. Each release
@@ -451,23 +538,18 @@ evidence for the end-to-end path.
 
 ## 12. Delivery sequence
 
-Development follows PyBLE's specification- and test-driven discipline:
+The explicit instruction to implement the complete catalog allowed source work
+for all three slices in one topic branch. It did not collapse their evidence or
+release gates.
 
-1. **M0 — governance:** approve this plan; add contributor/security guidance,
-   authoring and validation contracts, schema proposal, and release policy.
-2. **M1 — catalog red:** add failing schema/layout/governance tests in a `[red]`
-   commit.
-3. **M2 — validator green:** add the smallest schema, catalog, and tooling that
-   passes those tests in `[green]`; refactor separately while green.
-4. **M3 — v0.1 examples:** add a failing contract/behavior test before each
-   example, then the minimum source; gather HIL evidence without weakening the
-   intended profile set.
-5. **M4 — v0.1 release:** audit licensing and clean-room gates, validate GitHub
-   import, freeze evidence, update the changelog, and tag `examples-v0.1.0`.
-6. **M5 — v0.2:** implement portable/workflow examples first, then configured
-   hardware capabilities, with the same red/green/evidence flow.
-7. **M6 — v0.3:** add exact-hardware depth and composed projects only after the
-   underlying primitive examples are validated.
+| Milestone | Status | Outcome or remaining gate |
+| --- | --- | --- |
+| M0 — governance | Implemented | Plan approval, contributor/security guidance, authoring/validation contracts, schema, and release policy exist |
+| M1/M2 — catalog and validator | Implemented outcome | Strict schema, 32-record catalog, evidence schema, tests, and validator exist and pass local gates; CI is configured; separate red/green commit history is not claimed by this working tree |
+| M3 — v0.1 sources | Source implemented | All eight sources pass repository and compilation gates; HIL and live-import evidence remain open |
+| M4 — v0.1 release | Not started | Licensing/release audit, complete HIL matrix, live iPad/Android import, frozen evidence, signed tag, and release changelog are required |
+| M5 — v0.2 sources | Source implemented | All 17 sources exist; repository/compilation gates pass, while hardware and live-import evidence remain open |
+| M6 — v0.3 sources | Source implemented | All seven sources exist; repository/compilation gates pass, while hardware and live-import evidence remain open |
 
 Commits are DCO-signed (`git commit -s`) and use the PyBLE prefixes `[red]`,
 `[green]`, `[refactor]`, `[docs]`, `[build]`, or `[chore]`.
@@ -516,12 +598,17 @@ topic requires an explicit maintainer decision to change policy.
 
 ## 15. Definition of done
 
+Source presence and passing host gates are implementation milestones, not this
+definition of completion. No example or release currently satisfies the HIL,
+live-import, and immutable-evidence requirements below.
+
 An individual example is complete only when:
 
 - its planned contract and catalog record are reviewed;
 - tests were introduced red and pass after implementation;
 - all repository/importer/source/safety gates pass;
-- documentation states prerequisites, effects, observation, and cleanup;
+- documentation gives child-facing settings and run steps, then states
+  prerequisites, effects, observation, and cleanup;
 - every `validated_profiles` entry has immutable matching evidence;
 - the exact source imports through the live PyBLE GitHub path;
 - the expected terminal state—completion, the documented intentional error, or
@@ -534,34 +621,33 @@ A release is complete only when every catalog claim is internally consistent,
 the eight v0.1 examples satisfy their required profile matrix, release evidence
 is archived, and an annotated signed tag is published.
 
-## 16. Review checklist and open decisions
+## 16. Decision and evidence checklist
 
-Please review and either approve or change these points before implementation:
+- [x] Repository name `PyBLE-dev/examples` and local sibling layout
+- [x] The 32 stable example concepts and the 8-example v0.1 slice
+- [x] Folder taxonomy and globally unique `pyble_*.py` basenames
+- [x] `designed_profiles` separated from evidence-backed
+  `validated_profiles`
+- [x] Unset edit-before-run configuration for generic physical pins
+- [x] Child-facing setup guides and example recipes for every unset setting
+- [x] Exact Waveshare and Pico design assumptions
+- [x] Narrower source, batch, heap, output, and runtime limits
+- [ ] Required HIL matrix for designed release profiles, plus live iPad and
+  Android import checks
+- [x] Deferred/excluded topics and the process for admitting them later
+- [x] Independent release policy bound to immutable firmware metadata
 
-- [ ] Repository name `PyBLE-dev/examples` and local sibling layout
-- [ ] The 32 stable example concepts and the 8-example v0.1 slice
-- [ ] Folder taxonomy and globally unique `pyble_*.py` basenames
-- [ ] `designed_profiles` versus evidence-backed `validated_profiles`
-- [ ] Unset/edit-before-run configuration for generic physical pins
-- [ ] Exact Waveshare and Pico profile assumptions
-- [ ] Narrower source, batch, heap, output, and runtime limits
-- [ ] HIL on all claimed profiles, plus live iPad and Android import checks
-- [ ] Deferred/excluded topics and the process for admitting them later
-- [ ] Independent examples release tags bound to immutable firmware metadata
+Two governance questions are resolved for this implementation:
 
-Open design decisions for the governance phase:
+1. Generic pin configuration uses obvious unset constants edited and reviewed
+   in source. A future app form would be a separate product specification.
+2. Small evidence metadata uses the strict checked-in
+   `validation/index.json`; bulky immutable evidence belongs in signed release
+   assets referenced by that index.
 
-1. Should generic pin configuration remain an obvious constant edited in the
-   source, or should a future app feature provide a reviewed per-board form?
-   The initial recommendation is an unset source constant because it works now
-   and makes the physical choice explicit.
-2. Should validation evidence live in this repository under `validation/`, or
-   be published as release assets with a small checked-in index? The initial
-   recommendation is a checked-in metadata index plus immutable bulky release
-   assets.
-3. Should the app later show catalog discovery, compatibility filters, and a
-   prefilled official URL? If yes, that work needs its own PyBLE app
-   specification and must not be required for v0.1.
+Catalog discovery, compatibility filters, and a prefilled official URL in the
+app remain deferred. Any such work needs its own PyBLE app specification and is
+not required for the first examples release.
 
 ## 17. Upstream sources for this plan
 
@@ -579,5 +665,5 @@ pinned v0.6.0 source commit, especially:
 When older frozen specifications still describe a profile as pending, the
 current release README, changelog, release decision, and immutable descriptor
 control release status; the frozen documents continue to supply their technical
-constraints. This distinction should be captured explicitly in future
-compatibility records.
+constraints. The implemented catalog and `docs/compatibility.md` preserve this
+distinction explicitly.

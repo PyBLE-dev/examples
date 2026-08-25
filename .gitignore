@@ -1,0 +1,13 @@
+# Local contributor instructions
+/AGENTS.md
+
+# Python development artifacts
+__pycache__/
+*.py[cod]
+.coverage
+.pytest_cache/
+.venv/
+.ci/
+
+# MicroPython compiler output
+*.mpy
