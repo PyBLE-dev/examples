@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/PyBLE-dev/examples/validation/index.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "version", "records"],
+  "properties": {
+    "$schema": {
+      "const": "./index.schema.json"
+    },
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "records": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/record"
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "nonblank": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "example_id",
+        "example_commit",
+        "source_sha256",
+        "executed_source_sha256",
+        "configuration_edits",
+        "executed_source_asset",
+        "firmware",
+        "profile_id",
+        "carrier",
+        "fixture",
+        "wiring",
+        "app",
+        "host",
+        "import",
+        "expected",
+        "observed",
+        "terminal_state",
+        "cleanup",
+        "pble_responsive",
+        "validator_version",
+        "operator",
+        "timestamp_utc",
+        "result",
+        "assets"
+      ],
+      "properties": {
+        "id": {"$ref": "#/$defs/nonblank"},
+        "example_id": {"$ref": "#/$defs/nonblank"},
+        "example_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "source_sha256": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {"$ref": "#/$defs/sha256"}
+        },
+        "executed_source_sha256": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {"$ref": "#/$defs/sha256"}
+        },
+        "configuration_edits": {
+          "type": "array",
+          "maxItems": 32,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/configurationEdit"}
+        },
+        "executed_source_asset": {
+          "type": "string",
+          "maxLength": 512,
+          "pattern": "^$|\\S"
+        },
+        "firmware": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["agent", "tag", "source_commit", "descriptor_sha256"],
+          "properties": {
+            "agent": {"type": "string", "minLength": 1},
+            "tag": {"type": "string", "minLength": 1},
+            "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+            "descriptor_sha256": {"$ref": "#/$defs/sha256"}
+          }
+        },
+        "profile_id": {
+          "enum": [
+            "esp32-4mb",
+            "esp32-s3-n16r8",
+            "waveshare-esp32-s3-lcd-147b",
+            "esp32-c3-4mb",
+            "rpi-pico2-w"
+          ]
+        },
+        "carrier": {"$ref": "#/$defs/nonblank"},
+        "fixture": {"$ref": "#/$defs/nonblank"},
+        "wiring": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/nonblank"}
+        },
+        "app": {"$ref": "#/$defs/nonblank"},
+        "host": {"$ref": "#/$defs/nonblank"},
+        "import": {"$ref": "#/$defs/nonblank"},
+        "expected": {"$ref": "#/$defs/nonblank"},
+        "observed": {"$ref": "#/$defs/nonblank"},
+        "terminal_state": {"enum": ["done", "stopped", "error"]},
+        "cleanup": {"$ref": "#/$defs/nonblank"},
+        "pble_responsive": {"type": "boolean", "const": true},
+        "validator_version": {"$ref": "#/$defs/nonblank"},
+        "operator": {"$ref": "#/$defs/nonblank"},
+        "timestamp_utc": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "result": {"const": "passed"},
+        "assets": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "pattern": "\\S"
+          }
+        }
+      }
+    },
+    "configurationEdit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "constant", "value"],
+      "properties": {
+        "file": {
+          "type": "string",
+          "pattern": "^pyble_[a-z0-9_]+\\.py$"
+        },
+        "constant": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]*$"
+        },
+        "value": {"type": "string", "maxLength": 128}
+      }
+    }
+  }
+}

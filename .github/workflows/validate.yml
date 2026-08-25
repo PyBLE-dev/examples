@@ -1,0 +1,45 @@
+# SPDX-License-Identifier: MIT
+
+name: Validate examples
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out examples
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+
+      - name: Check out pinned MicroPython
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          repository: micropython/micropython
+          ref: e0e9fbb17ed6fd06bb76e266ae554784c9c80804
+          path: .ci/micropython
+
+      - name: Build pinned mpy-cross
+        run: make -C .ci/micropython/mpy-cross -j2
+
+      - name: Run host tests
+        run: make test
+
+      - name: Validate catalog and MicroPython compilation
+        run: >-
+          make validate-mpy
+          MPY_CROSS="$GITHUB_WORKSPACE/.ci/micropython/mpy-cross/build/mpy-cross"
+
+      - name: Check whitespace
+        run: >-
+          git diff --check
+          "$(git hash-object -t tree /dev/null)" HEAD --
